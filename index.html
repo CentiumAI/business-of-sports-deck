@@ -469,24 +469,49 @@
     pointer-events: none;
   }
   .s-overview .countdown > * { position: relative; z-index: 1; }
-  .s-overview .countdown .num {
+  .s-overview .countdown .timer {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+    align-items: start;
+    gap: 0 0.9cqw;
+  }
+  .s-overview .countdown .timer .unit { display: grid; gap: 0.4cqh; justify-items: center; }
+  .s-overview .countdown .timer .v {
     font-family: var(--f-display);
     font-weight: 400;
-    font-size: 4.8cqh;
+    font-size: 4.6cqh;
     line-height: 0.9;
     letter-spacing: 0.015em;
     color: var(--utah-red-bright);
     text-shadow: 0 0 22px rgba(230,0,18,0.35);
-    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    min-width: 2.2ch;
+    text-align: center;
+    transition: text-shadow 0.18s ease-out;
   }
-  .s-overview .countdown .num .unit {
-    color: var(--paper);
+  .s-overview .countdown .timer .l {
     font-family: var(--f-mono);
     font-weight: 700;
-    font-size: 0.28em;
-    letter-spacing: 0.32em;
-    margin-left: 0.6cqw;
-    vertical-align: 0.8em;
+    font-size: 1.0cqh;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+  }
+  .s-overview .countdown .timer .sep {
+    font-family: var(--f-display);
+    font-weight: 400;
+    font-size: 4.0cqh;
+    line-height: 0.95;
+    color: rgba(255,255,255,0.28);
+    align-self: start;
+    padding-top: 0.2cqh;
+  }
+  .s-overview .countdown .timer #bos-secs {
+    animation: bosTick 1s steps(2, jump-none) infinite;
+  }
+  @keyframes bosTick {
+    0%, 50% { text-shadow: 0 0 22px rgba(230,0,18,0.55); }
+    100%    { text-shadow: 0 0 22px rgba(230,0,18,0.20); }
   }
   .s-overview .countdown .meta {
     text-align: right;
@@ -2115,7 +2140,15 @@
       <h2 data-anim="reveal">THE MINOR<br/><span class="red">AT A GLANCE.</span></h2>
 
       <div class="countdown" data-anim="rise-2">
-        <div class="num"><span id="bos-days">—</span><span class="unit">DAYS</span></div>
+        <div class="timer">
+          <div class="unit"><div class="v" id="bos-days">—</div><div class="l">DAYS</div></div>
+          <div class="sep">:</div>
+          <div class="unit"><div class="v" id="bos-hrs">—</div><div class="l">HRS</div></div>
+          <div class="sep">:</div>
+          <div class="unit"><div class="v" id="bos-mins">—</div><div class="l">MIN</div></div>
+          <div class="sep">:</div>
+          <div class="unit"><div class="v" id="bos-secs">—</div><div class="l">SEC</div></div>
+        </div>
         <div class="meta">
           <span class="label">— UNTIL FIRST CLASS</span>
           <span class="date">MON <span class="red">·</span> 23 AUG 2027 <span class="red">·</span> 7:30 AM MT</span>
@@ -2973,15 +3006,26 @@
   // First class: Mon Aug 23, 2027 at 7:30 AM MDT (UTC−6).
   const LAUNCH_UTC_MS = Date.UTC(2027, 7, 23, 13, 30, 0);
   const bosDaysEl = document.getElementById('bos-days');
+  const bosHrsEl  = document.getElementById('bos-hrs');
+  const bosMinsEl = document.getElementById('bos-mins');
+  const bosSecsEl = document.getElementById('bos-secs');
+  const pad2 = n => String(n).padStart(2, '0');
   function updateLaunchCountdown() {
     if (!bosDaysEl) return;
-    const diff = LAUNCH_UTC_MS - Date.now();
-    const days = Math.max(0, Math.ceil(diff / 86400000));
+    const diff = Math.max(0, LAUNCH_UTC_MS - Date.now());
+    const totalSec = Math.floor(diff / 1000);
+    const days = Math.floor(totalSec / 86400);
+    const hrs  = Math.floor((totalSec % 86400) / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = totalSec % 60;
     bosDaysEl.textContent = days.toLocaleString('en-US');
+    bosHrsEl.textContent  = pad2(hrs);
+    bosMinsEl.textContent = pad2(mins);
+    bosSecsEl.textContent = pad2(secs);
   }
   updateLaunchCountdown();
-  // Re-tick every minute so the value stays fresh during long presentations.
-  setInterval(updateLaunchCountdown, 60000);
+  // Tick every second so the clock reads truly live.
+  setInterval(updateLaunchCountdown, 1000);
 
   // ─── DAAP stat count-up animation ──────────────────────────────────────
   // Cache the target HTML for each .stat .n so we can reset & replay.
