@@ -457,15 +457,15 @@
     gap: 2.4cqw;
     padding: 1.0cqh 2cqw;
     margin-bottom: 1.6cqh;
-    background: #000;
+    background: var(--utah-red);
     color: var(--paper);
-    border-left: 6px solid var(--utah-red);
+    border-left: 6px solid #000;
     position: relative;
     overflow: hidden;
   }
   .s-overview .countdown::after {
-    content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 35%;
-    background: radial-gradient(ellipse at 90% 50%, rgba(190,0,0,0.32), transparent 70%);
+    content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 40%;
+    background: radial-gradient(ellipse at 90% 50%, rgba(0,0,0,0.22), transparent 70%);
     pointer-events: none;
   }
   .s-overview .countdown > * { position: relative; z-index: 1; }
@@ -482,8 +482,8 @@
     font-size: 4.6cqh;
     line-height: 0.9;
     letter-spacing: 0.015em;
-    color: var(--utah-red-bright);
-    text-shadow: 0 0 22px rgba(230,0,18,0.35);
+    color: var(--paper);
+    text-shadow: 0 0 22px rgba(255,255,255,0.30);
     font-variant-numeric: tabular-nums;
     min-width: 2.2ch;
     text-align: center;
@@ -494,7 +494,7 @@
     font-weight: 700;
     font-size: 1.0cqh;
     letter-spacing: 0.3em;
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.82);
     text-transform: uppercase;
   }
   .s-overview .countdown .timer .sep {
@@ -502,7 +502,7 @@
     font-weight: 400;
     font-size: 4.0cqh;
     line-height: 0.95;
-    color: rgba(255,255,255,0.28);
+    color: rgba(255,255,255,0.42);
     align-self: start;
     padding-top: 0.2cqh;
   }
@@ -510,8 +510,8 @@
     animation: bosTick 1s steps(2, jump-none) infinite;
   }
   @keyframes bosTick {
-    0%, 50% { text-shadow: 0 0 22px rgba(230,0,18,0.55); }
-    100%    { text-shadow: 0 0 22px rgba(230,0,18,0.20); }
+    0%, 50% { text-shadow: 0 0 24px rgba(255,255,255,0.65); }
+    100%    { text-shadow: 0 0 22px rgba(255,255,255,0.18); }
   }
   .s-overview .countdown .meta {
     text-align: right;
@@ -525,7 +525,7 @@
   }
   .s-overview .countdown .meta .label {
     display: block;
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.78);
     margin-bottom: 0.4cqh;
   }
   .s-overview .countdown .meta .date {
@@ -533,7 +533,7 @@
     font-weight: 700;
     letter-spacing: 0.28em;
   }
-  .s-overview .countdown .meta .date .red { color: var(--utah-red-bright); }
+  .s-overview .countdown .meta .date .red { color: rgba(255,255,255,0.55); }
 
   .s-overview .grid {
     display: grid;
