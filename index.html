@@ -1224,8 +1224,18 @@
     line-height: 0.9;
     letter-spacing: 0.005em;
     color: var(--ink);
+    transform-origin: left center;
+    will-change: transform, opacity;
   }
   .s-daap .stat .n .small { font-size: 0.55em; color: var(--utah-red); vertical-align: top; }
+  .s-daap .stat .n.snap {
+    animation: daapSnap 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes daapSnap {
+    0%   { opacity: 0; transform: scale(0.35); }
+    55%  { opacity: 1; transform: scale(1.18); }
+    100% { opacity: 1; transform: scale(1); }
+  }
   .s-daap .stat .label {
     color: var(--utah-red);
   }
@@ -2890,6 +2900,58 @@
   let i = 0;
   const pad = n => String(n).padStart(2,'0');
 
+  // ─── DAAP stat count-up animation ──────────────────────────────────────
+  // Cache the target HTML for each .stat .n so we can reset & replay.
+  const daapStatNs = Array.from(document.querySelectorAll('.s-daap .stat .n'));
+  daapStatNs.forEach(n => { n.dataset.targetHtml = n.innerHTML; });
+  let daapTimers = [];
+  function clearDaapTimers() { daapTimers.forEach(t => clearTimeout(t)); daapTimers = []; }
+  function resetDaapStats() {
+    clearDaapTimers();
+    daapStatNs.forEach(n => {
+      n.classList.remove('snap');
+      n.style.opacity = '';
+      n.innerHTML = n.dataset.targetHtml;
+    });
+  }
+  function animateDaapStats() {
+    resetDaapStats();
+    daapStatNs.forEach((n, idx) => {
+      const targetHtml = n.dataset.targetHtml;
+      const targetText = n.textContent.trim();
+      // Leading numeric (with optional commas): "2,000+" → 2000 + suffix
+      const m = targetText.match(/^([\d,]+)(.*)$/);
+      if (m) {
+        const num = parseInt(m[1].replace(/,/g, ''), 10);
+        const hasComma = m[1].includes(',');
+        // Initial state: replace leading number with 0
+        n.innerHTML = targetHtml.replace(/^[\d,]+/, '0');
+        const delay = 320 + idx * 180;
+        daapTimers.push(setTimeout(() => {
+          const start = performance.now();
+          const duration = 1100;
+          (function tick(now) {
+            const t = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - t, 3);
+            const current = Math.floor(eased * num);
+            const formatted = hasComma ? current.toLocaleString('en-US') : String(current);
+            n.innerHTML = targetHtml.replace(/^[\d,]+/, formatted);
+            if (t < 1) requestAnimationFrame(tick);
+            else n.innerHTML = targetHtml;
+          })(performance.now());
+        }, delay));
+      } else if (targetText.startsWith('#')) {
+        // "#1" — snap in after the others finish counting up
+        n.style.opacity = '0';
+        daapTimers.push(setTimeout(() => {
+          n.style.opacity = '';
+          n.classList.add('snap');
+          daapTimers.push(setTimeout(() => n.classList.remove('snap'), 700));
+        }, 1700));
+      }
+    });
+  }
+
   let flipTimer = null;
   function setActive(next) {
     const total = slides.length;
@@ -2915,9 +2977,11 @@
         } else {
           s.classList.add('active');
         }
+        if (s.classList.contains('s-daap')) animateDaapStats();
       } else {
         s.classList.remove('active');
         s.classList.remove('flipping');
+        if (s.classList.contains('s-daap')) resetDaapStats();
       }
     });
     i = next;
