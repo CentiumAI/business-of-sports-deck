@@ -1315,12 +1315,11 @@
   }
   .s-daap .stat .n .small { font-size: 0.55em; color: var(--utah-red); vertical-align: top; }
   .s-daap .stat .n.snap {
-    animation: daapSnap 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: daapSnap 0.7s ease-out;
   }
   @keyframes daapSnap {
-    0%   { opacity: 0; transform: scale(0.35); }
-    55%  { opacity: 1; transform: scale(1.18); }
-    100% { opacity: 1; transform: scale(1); }
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
   }
   .s-daap .stat .label {
     color: var(--utah-red);
